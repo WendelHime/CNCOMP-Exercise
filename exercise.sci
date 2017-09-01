@@ -11,14 +11,17 @@
 // e profundidade D (em m)
 // Para a superfície, t = 0°C e S = 35, c aumenta 4 m/s para Δt = +1°C,
 // aumenta 1,4 m/s para ΔS = +1 e aumenta 1,7 m/s para ΔD = +100 m (efeito da pressão).
+//    intervalos_temperatura(1, i) = -0.338+(s*fD)/(1.485*(10^-4)*s*intervalo_profundidade(i) + fD);  
 s = input("Insira a salinidade da água: ");
 
-intervalo_profundidade = [0:500:4500]; 
+intervalo_profundidade = [0:1:4500]; 
+temperaturaSuperficie = input("Insira o valor da temperatura na superfície: ");
 intervalos_temperatura = [];
 for i = 1:length(intervalo_profundidade)
-    intervalos_temperatura(1, i) = input(strcat(["Insira o valor da temperatura da profundidade em  ", string(intervalo_profundidade(i)), "m"])); 
+    fD = 1+(%e^(-0.017*intervalo_profundidade(i)+1.4));
+    intervalos_temperatura(1, i) = -0.055+(temperaturaSuperficie*fD)/(1.449*(10^-4)*temperaturaSuperficie*intervalo_profundidade(i) + fD);
 end
- 
+
 polinomioTemperatura = poly([1449 4.6 -0.055], "t", "coeff") 
 c = []
 
@@ -29,4 +32,4 @@ end
 xtitle("Velocidade do som pela profundidade");
 xlabel("Profundidade em m");
 ylabel("Velocidade do som em m/(s^-1)");
-plot(intervalo_profundidade, c, "*") ;
+plot2d(intervalo_profundidade, c) ;
