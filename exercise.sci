@@ -30,3 +30,50 @@ xtitle("Velocidade do som pela profundidade");
 xlabel("Profundidade em m");
 ylabel("Velocidade do som em m/(s^-1)");
 plot(intervalo_profundidade, c, "*") ;
+
+
+
+// implementação de regreção polinomial
+// Prof. Filipe Taveiros UFRN - disponivel em https://www.passeidireto.com/arquivo/6740095/aula-4---ajuste-de-curvas---atualizado
+function [x] = retroativa(A,b)
+    [l,c] = size(A);
+    for i=c:-1:1
+        soma =0;
+        for j=i+1:c
+            soma =soma +x(j)*A(i,j);
+        end
+        x(i) = (b(i) - soma)/A(i,i);
+    end
+endfunction
+
+function [x] = sislingauss(A,b)
+    [l,c] = size(A);
+    Aa = [A b]; //matriz aumentada 
+    for i=1:l-1//Início do escalonamento
+        pivo=Aa(i,i);
+        for j=i+1:c
+            m = -Aa(j,i)/pivo;
+            Aa(j,:) =Aa(j,:) +m*Aa(i,:);
+        end
+    end
+    A =Aa(:,1:c);
+    b =Aa(:,c+1);
+    x =retroativa(A,b); //Solução
+endfunction
+            
+function a =Lpolinomial(x,y,k)
+    for j=0:k //Laço que varre as colunas
+        for i=0:k //Laço que varre as linhas
+            A(i+1,j+1)=sum(x.^(j+i));
+        end
+        b(j+1,1)=sum(y.*x.^(j));
+    end
+    a=sislingauss(A,b);
+endfunction
+
+// polinomio de grau 4
+as = Lpolinomial(intervalo_profundidade,c,4)
+y_polinomio =  polinomio(5)*intervalo_profundidade.^4 + polinomio(4)*intervalo_profundidade.^3 + polinomio(3)*intervalo_profundidade.^2 + polinomio(2)*intervalo_profundidade + polinomio(1);
+// suavizar curva
+y_smooth=smooth([intervalo_profundidade;y_polinomio],0.1);
+plot2d(y_smooth(1,:)',y_smooth(2,:)',[1],"000");
